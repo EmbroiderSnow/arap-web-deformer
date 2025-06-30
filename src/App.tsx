@@ -348,18 +348,49 @@ function App() {
     }
   }, [loadedGeometry]); // 使用 loadedGeometry 作为模型加载完成的标志
 
+  const handleTransformEnd = useCallback(() => {
+    if (!modelRef.current) return;
+    
+    console.log('[App] Transform ended. Updating handle positions...');
+
+    // 使用所有当前选中的点（拖拽点和锚点）的索引
+    const allIndices = [...new Set([...handleIndices, ...anchorIndices])];
+    const newPositions = new Map<number, THREE.Vector3>();
+
+    // 遍历所有索引，获取它们在模型经过新的变换后的世界坐标
+    allIndices.forEach(index => {
+      // getVertexWorldPosition 内部已经包含了 updateMatrixWorld(true) 的调用，确保获取的是最新坐标
+      const newWorldPos = modelRef.current.getVertexWorldPosition(index);
+      if (newWorldPos) {
+        newPositions.set(index, newWorldPos);
+      }
+    });
+
+    // 用最新的、正确的世界坐标更新 React state
+    setHandlePositions(newPositions);
+  }, [handleIndices, anchorIndices]); // 依赖项确保函数能访问到最新的索引列表
+
+  // 2. 修改 useEffect，为 TransformControls 添加和移除事件监听器
   useEffect(() => {
     const controls = transformControlsRef.current;
     if (controls) {
       const handleDraggingChanged = (event: any) => {
         setIsOrbitEnabled(!event.value);
       };
+
+      // 添加拖拽状态变化监听 (用于禁用 OrbitControls)
       controls.addEventListener('dragging-changed', handleDraggingChanged);
+      
+      // 添加变换结束监听 (用于更新控制点位置)
+      controls.addEventListener('mouseUp', handleTransformEnd);
+
+      // 清理函数
       return () => {
         controls.removeEventListener('dragging-changed', handleDraggingChanged);
+        controls.removeEventListener('mouseUp', handleTransformEnd);
       };
     }
-  }, [transformTarget]); // 依赖 transformTarget 确保 controls 已渲染
+  }, [transformTarget, handleTransformEnd]);
 
    // MODIFIED: handleVertexSelected now includes debugging info
   const handleVertexSelected = (index: number) => {
