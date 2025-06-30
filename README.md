@@ -2,9 +2,10 @@
 
 ---
 
-## 运行方式（暂时）
+## 运行方式
 
 ```
+npm install antd @ant-design/icons three @react-three/fiber @react-three/drei
 npm run dev
 ```
 然后打开浏览器访问[localhost:5173](http://localhost:5173)
