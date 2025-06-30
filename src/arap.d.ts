@@ -1,7 +1,7 @@
-// src/wasm/arap.d.ts (新版本)
+// src/wasm/arap.d.ts
 
 /**
- * 描述由新的 C++ Deform 库封装而来的 ArapController 实例。
+ * 描述由C++ Deform 库封装而来的 ArapController 实例。
  */
 interface ArapController {
   set_handles(handle_indices: Int32Array, handle_positions: Float32Array): void;

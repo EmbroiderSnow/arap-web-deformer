@@ -1,4 +1,4 @@
-// src/services/WasmSolverService.ts (新版本)
+// src/services/WasmSolverService.ts
 
 // The types are declared globally in `arap.d.ts`.
 let scriptLoadingPromise: Promise<void> | null = null;
